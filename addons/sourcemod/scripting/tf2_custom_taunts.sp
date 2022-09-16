@@ -407,7 +407,19 @@ void EndTaunt(int client, bool remove)
 	HideWeapons(client, true);
 	HideHat(client, true);
 
-	SetVariantString(Models[Client[client].Taunt][Client[client].Model].Replace);
+	switch(TF2_GetPlayerClass(client))
+	{
+		case TFClass_Scout:		SetVariantString("models/player/scout.mdl");
+		case TFClass_Pyro:		SetVariantString("models/player/pyro.mdl");
+		case TFClass_DemoMan:	SetVariantString("models/player/demo.mdl");
+		case TFClass_Heavy:		SetVariantString("models/player/heavy.mdl");
+		case TFClass_Engineer:	SetVariantString("models/player/engineer.mdl");
+		case TFClass_Medic:		SetVariantString("models/player/medic.mdl");
+		case TFClass_Sniper:	SetVariantString("models/player/sniper.mdl");
+		case TFClass_Spy:		SetVariantString("models/player/spy.mdl");
+		default:				SetVariantString("models/player/soldier.mdl");
+	}
+	
 	AcceptEntityInput(client, "SetCustomModel");
 	SetEntProp(client, Prop_Send, "m_bUseClassAnimations", 1);
 	Client[client].Taunt = -1;
