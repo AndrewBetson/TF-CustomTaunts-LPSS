@@ -2,6 +2,24 @@
 {
 	"tf"
 	{
+		"Functions"
+		{
+			"CTFPlayer::MimicTauntFromPartner"
+			{
+				"signature"	"CTFPlayer::MimicTauntFromPartner"
+				"callconv"	"thiscall"
+				"return"	"void"
+				"this"		"entity"
+
+				"arguments"
+				{
+					"initiator"
+					{
+						"type" "cbaseentity"
+					}
+				}
+			}
+		}
 		"Signatures"
 		{
 			"CTFPlayer::PlayTauntSceneFromItem"
@@ -11,7 +29,11 @@
 				"linux"		"@_ZN9CTFPlayer22PlayTauntSceneFromItemEPK13CEconItemView"
 				"mac"		"@_ZN9CTFPlayer22PlayTauntSceneFromItemEPK13CEconItemView"
 			}
+			"CTFPlayer::MimicTauntFromPartner"
+			{
+				"library"	"server"
+				"linux"		"@_ZN9CTFPlayer21MimicTauntFromPartnerEPS_"
+			}
 		}
 	}
 }
-

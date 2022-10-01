@@ -4,6 +4,7 @@
 #include <tf2_stocks>
 #include <tf2attributes>
 #include <tf2items>
+#include <dhooks>
 
 #pragma newdecls required
 
@@ -75,6 +76,7 @@ enum struct ClientEnum
 	float EndAt;
 	int Taunt;
 	int Model;
+	bool bInCustomTaunt;
 }
 
 SoundEnum Sound[MAXTAUNTS][MAXMODELS][MAXSOUNDS];
@@ -82,6 +84,7 @@ ModelEnum Models[MAXTAUNTS][MAXMODELS];
 TauntEnum Taunt[MAXTAUNTS];
 ClientEnum Client[MAXTF2PLAYERS];
 Handle SDKPlayTaunt;
+DHookSetup g_hDetour_MimicTauntFromPartner;
 int Taunts;
 bool Enabled;
 
@@ -108,6 +111,12 @@ public void OnPluginStart()
 	SDKPlayTaunt = EndPrepSDKCall();
 	if(SDKPlayTaunt == INVALID_HANDLE)
 		SetFailState("Failed to create call: CTFPlayer::PlayTauntSceneFromItem.");
+
+	g_hDetour_MimicTauntFromPartner = DHookCreateFromConf( gameData, "CTFPlayer::MimicTauntFromPartner" );
+	if ( !DHookEnableDetour( g_hDetour_MimicTauntFromPartner, false, Detour_MimicTauntFromPartner ) )
+	{
+		SetFailState( "Failed to detour CTFPlayer::MimicTauntFromPartner, tell Andrew to update the signatures." );
+	}
 
 	delete gameData;
 
@@ -340,6 +349,24 @@ public void OnGameFrame()
 	}
 }
 
+public MRESReturn Detour_MimicTauntFromPartner( int pThis, DHookParam hParams )
+{
+	if ( hParams.IsNull( 1 ) )
+	{
+		return MRES_Ignored;
+	}
+
+	int nInitiatorClientIdx = hParams.Get( 1 );
+	if ( Client[ nInitiatorClientIdx ].bInCustomTaunt )
+	{
+		StartTaunt( pThis, Client[ nInitiatorClientIdx ].Taunt, CheckTauntModel( pThis, Client[ nInitiatorClientIdx ].Taunt ), true );
+
+		return MRES_Handled;
+	}
+
+	return MRES_Ignored;
+}
+
 public Action HookTauntMessage(UserMsg msg_id, BfRead msg, const int[] players, int playersNum, bool reliable, bool init) 
 {
 	int byte = msg.ReadByte();
@@ -424,9 +451,10 @@ void EndTaunt(int client, bool remove)
 	AcceptEntityInput(client, "SetCustomModel");
 	SetEntProp(client, Prop_Send, "m_bUseClassAnimations", 1);
 	Client[client].Taunt = -1;
+	Client[client].bInCustomTaunt = false;
 }
 
-bool StartTaunt(int client, int taunt, int model)
+bool StartTaunt(int client, int taunt, int model, bool bMimic)
 {
 	static Handle item;
 	if(item == INVALID_HANDLE)
@@ -484,7 +512,7 @@ bool StartTaunt(int client, int taunt, int model)
 		SetEntProp(client, Prop_Send, "m_bUseClassAnimations", 1);
 	}
 
-	if(Models[taunt][model].Sound[0])
+	if(Models[taunt][model].Sound[0] && !bMimic)
 		EmitSoundToAll(Models[taunt][model].Sound, client);
 
 	if(Models[taunt][model].Duration > 0)
@@ -502,6 +530,7 @@ bool StartTaunt(int client, int taunt, int model)
 
 	Client[client].Taunt = taunt;
 	Client[client].Model = model;
+	Client[client].bInCustomTaunt = true;
 
 	Client[client].EndAt = Models[taunt][model].Duration>0 ? Models[taunt][model].Duration+GetGameTime() : 0.0;
 	Enabled = true;
@@ -570,7 +599,7 @@ public Action CommandMenu(int client, int args)
 			return Plugin_Handled;
 		}
 
-		StartTaunt(client, taunt, model);
+		StartTaunt(client, taunt, model, false);
 		return Plugin_Handled;
 	}
 
@@ -618,7 +647,7 @@ public Action CommandMenu(int client, int args)
 
 		int model = CheckTauntModel(targets[target], taunt);
 		if(model != -1)
-			StartTaunt(targets[target], taunt, model);
+			StartTaunt(targets[target], taunt, model, false);
 	}
 	
 	if(tn_is_ml)
@@ -658,7 +687,7 @@ public int CommandMenuH(Menu menu, MenuAction action, int client, int choice)
 				return;
 			}
 
-			if(StartTaunt(client, taunt, model))
+			if(StartTaunt(client, taunt, model, false))
 				CommandMenu(client, 0);
 		}
 	}
@@ -800,4 +829,5 @@ stock void HideHat(int client, bool unhide = false)
 	}
 }
 
-#file "TF2: Custom Taunts"
+// NOTE(AndrewB): I legit have no idea what this is supposed to do, but it just trips a compile error, so...
+//#file "TF2: Custom Taunts"
