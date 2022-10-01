@@ -7,7 +7,7 @@
 
 #pragma newdecls required
 
-#define PLUGIN_VERSION "0.1.1"
+#define PLUGIN_VERSION "1.0.0-andrewb"
 
 #define FAR_FUTURE		100000000.0
 #define MAX_SOUND_LENGTH	80
@@ -88,7 +88,7 @@ bool Enabled;
 public Plugin myinfo =
 {
 	name		=	"TF2: Custom Taunts",
-	author		=	"Batfoxkid",
+	author		=	"Batfoxkid, Andrew \"andrewb\" Betson",
 	description	=	"Custom taunts for players to use",
 	version		=	PLUGIN_VERSION
 };
@@ -116,7 +116,8 @@ public void OnPluginStart()
 	CreateConVar("customtaunts_version", PLUGIN_VERSION, "Custom Taunts Plugin Version", FCVAR_NOTIFY|FCVAR_DONTRECORD);
 
 	RegConsoleCmd("sm_taunt", CommandMenu, "Open a menu of taunts");
-	RegConsoleCmd("sm_taunts", CommandList, "View a list of taunt ids");
+	RegConsoleCmd("sm_taunts", CommandMenu, "Open a menu of taunts");
+	RegConsoleCmd("sm_tauntlist", CommandList, "View a list of taunt ids");
 
 	AddCommandListener(OnJoinClass, "joinclass");
 	AddCommandListener(OnJoinClass, "join_class");
