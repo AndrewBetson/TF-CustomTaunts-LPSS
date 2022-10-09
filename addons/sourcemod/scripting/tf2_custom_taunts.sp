@@ -491,7 +491,7 @@ bool StartTaunt(int client, int taunt, int model, bool bMimic)
 	{
 		TF2Attrib_SetByDefIndex(client, 201, 0.01);	// Extends the taunt's lifetime
 	}
-	else
+	else if ( Models[ taunt ][ model ].Speed != 1.0 )
 	{
 		TF2Attrib_SetByDefIndex(client, 201, Models[taunt][model].Speed);
 	}
@@ -515,7 +515,7 @@ bool StartTaunt(int client, int taunt, int model, bool bMimic)
 	if(Models[taunt][model].Sound[0] && !bMimic)
 		EmitSoundToAll(Models[taunt][model].Sound, client);
 
-	if(Models[taunt][model].Duration > 0)
+	if(Models[taunt][model].Duration > 0 && Models[ taunt ][ model ].Speed != 1.0)
 		TF2Attrib_SetByDefIndex(client, 201, Models[taunt][model].Speed);
 
 	if(Models[taunt][model].IsHideWeapon)
