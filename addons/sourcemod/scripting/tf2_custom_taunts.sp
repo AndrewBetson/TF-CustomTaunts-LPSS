@@ -677,20 +677,22 @@ public int CommandMenuH(Menu menu, MenuAction action, int client, int choice)
 			if(!CheckTauntAccess(client, taunt))
 			{
 				ReplyToCommand(client, "[SM] You no longer have access to this taunt");
-				return;
+				return 0;
 			}
 
 			int model = CheckTauntModel(client, taunt);
 			if(model == -1)
 			{
 				ReplyToCommand(client, "[SM] You no longer use this taunt");
-				return;
+				return 0;
 			}
 
 			if(StartTaunt(client, taunt, model, false))
 				CommandMenu(client, 0);
 		}
 	}
+
+	return 0;
 }
 
 public Action CommandList(int client, int args)
@@ -703,6 +705,8 @@ public Action CommandList(int client, int args)
 
 	if(GetCmdReplySource() == SM_REPLY_TO_CHAT)
 		ReplyToCommand(client, "[SM] %t", "See console for output");
+
+	return Plugin_Continue;
 }
 
 // Stocks
