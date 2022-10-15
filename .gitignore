@@ -1,7 +1,27 @@
-*.dat
-*.exe
-*.smx
-*.inc
-[Cc]compiled/
-[Dd]esktop.ini
-[Tt]humbs.db
+# Ignore everything by default.
+*.*
+
+# Game content.
+!*.mdl
+!*.phy
+!*.vtx
+!*.vvd
+!*.wav
+
+# Scripts and stuff.
+!*.sp
+!*.inc
+!*.phrases.txt
+!*.games.txt
+!*.cfg
+!*.sh
+!*.bat
+
+# Git stuff.
+!LICENSE.md
+!README.md
+!.gitignore
+!*.yml
+
+# Don't commit data from staged builds.
+/__STAGING__/
