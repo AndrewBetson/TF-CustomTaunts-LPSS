@@ -289,14 +289,14 @@ public void OnClientPostAdminCheck(int client)
 
 public void TF2_OnConditionRemoved(int client, TFCond condition)
 {
-	if(condition == TFCond_Taunting)
+	if(condition == TFCond_Taunting && Client[ client ].bInCustomTaunt)
 		EndTaunt(client, false);
 }
 
 public Action OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast)
 {
 	int client = GetClientOfUserId(event.GetInt("userid"));
-	if(IsValidClient(client))
+	if(IsValidClient(client) && Client[ client ].bInCustomTaunt)
 		EndTaunt(client, true);
 
 	return Plugin_Continue;
@@ -305,7 +305,7 @@ public Action OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast)
 public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast)
 {
 	int client = GetClientOfUserId(event.GetInt("userid"));
-	if(IsValidClient(client))
+	if(IsValidClient(client) && Client[ client ].bInCustomTaunt)
 		EndTaunt(client, false);
 
 	return Plugin_Continue;
@@ -313,7 +313,7 @@ public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast)
 
 public Action OnJoinClass(int client, const char[] command, int args)
 {
-	if(Client[client].Taunt==-1 || !Models[Client[client].Taunt][Client[client].Model].Replace[0])
+	if(Client[client].Taunt==-1 || !Models[Client[client].Taunt][Client[client].Model].Replace[0] || !Client[ client ].bInCustomTaunt)
 		return Plugin_Continue;
 
 	EndTaunt(client, true);
@@ -408,7 +408,12 @@ public Action HookSound(int clients[MAXPLAYERS], int &numClients, char sound[PLA
 void EndTaunt(int client, bool remove)
 {
 	Client[client].EndAt = 0.0;
-	TF2Attrib_SetByDefIndex(client, 201, 1.0);
+
+	if ( Models[ Client[ client ].Taunt ][ Client[ client ].Model ].Speed != 1.0 )
+	{
+		TF2Attrib_SetByDefIndex(client, 201, 1.0);
+	}
+
 	if(remove && IsPlayerAlive(client))
 		TF2_RemoveCondition(client, TFCond_Taunting);
 
