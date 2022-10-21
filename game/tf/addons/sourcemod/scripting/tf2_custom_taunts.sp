@@ -38,7 +38,7 @@
 #define MAXMODELS	12
 
 #if !defined PLUGIN_VERSION
-	#define PLUGIN_VERSION "1.0.0-andrewb"
+	#define PLUGIN_VERSION "1.0.1-andrewb"
 #endif // !defined PLUGIN_VERSION
 
 enum struct SoundEnum
